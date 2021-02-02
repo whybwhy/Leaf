@@ -142,36 +142,4 @@ TokenService.java
 
 -------
 
-#### Repository 샘플
-<pre>
-
-BoardRespository.java
-
-@Repository
-public interface BoardRepository extends JpaRepository<Board, Long> {
-}
-
-</pre>
-
--------
-
-#### Test
-BoardControllerTest.java 샘플
-
-<pre>
-@Test
-    @JunitDocument("Board - 게시물 생성")
-    void create() throws Exception {
-        MultiValueMap<String, String> info = new LinkedMultiValueMap<>();
-
-        info.add("title", "title");
-        info.add("name", "summer");
-        info.add("contents", "contents");
-
-        mockMvc.perform(post("/v1/board/create")
-                .params(info))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
-</pre>
 
