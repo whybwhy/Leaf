@@ -142,4 +142,56 @@ TokenService.java
 
 -------
 
+#### DB 연관관계
+하...작성중....
+
+#### DDL
+
+<pre>
+CREATE TABLE `token` (
+  `token` varchar(255) NOT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `modified_date` datetime DEFAULT NULL,
+  `amount` bigint(20) DEFAULT NULL,
+  `count` int(11) DEFAULT NULL,
+  `expired_date` datetime DEFAULT NULL,
+  `owner_id` varchar(255) DEFAULT NULL,
+  `room_id` bigint(20) DEFAULT NULL,
+  `total_amount` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE TABLE `token_history` (
+  `id` bigint(20) NOT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `modified_date` datetime DEFAULT NULL,
+  `amount` bigint(20) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK14x0htp7bokse1sgol03qyhon` (`token`),
+  CONSTRAINT `FK14x0htp7bokse1sgol03qyhon` FOREIGN KEY (`token`) REFERENCES `token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+
+CREATE TABLE `chat_room` (
+  `chat_room_id` bigint(20) NOT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `modified_date` datetime DEFAULT NULL,
+  `chat_title` varchar(255) DEFAULT NULL,
+  `owner_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`chat_room_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE TABLE `chat_user` (
+  `user_id` varchar(255) NOT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `modified_date` datetime DEFAULT NULL,
+  `chat_room_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  KEY `FK67fgnu7l9ghfnf79aj7p316rx` (`chat_room_id`),
+  CONSTRAINT `FK67fgnu7l9ghfnf79aj7p316rx` FOREIGN KEY (`chat_room_id`) REFERENCES `chat_room` (`chat_room_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+</pre>
 
