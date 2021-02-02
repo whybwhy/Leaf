@@ -1,0 +1,39 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+#### 파라메터나 헤더 데이터에 한글 처리는 안되어 있습니다. 알파벳이나 숫자로 테스트가 가능합니다.
+
+### 채팅방 + 신규 유저 생성
+GET http://localhost:8080/create/room/hihi
+X-USER-ID: test
+Connection: Close
+
+### 채팅방 입장
+GET http://localhost:8080/join/room
+X-USER-ID: test4
+X-ROOM-ID: 26
+Connection: Close
+
+
+### 토큰 발행
+GET http://localhost:8080/produce/2/1000
+X-USER-ID: test
+X-ROOM-ID: 26
+Connection: Close
+
+### 토큰 소모
+GET http://localhost:8080/consume/yxY
+X-USER-ID: test
+X-ROOM-ID: 26
+Connection: Close
+
+### 토큰 상태
+GET http://localhost:8080/status/rQd
+X-USER-ID: test3
+X-ROOM-ID: 17
+Connection: Close
+###
