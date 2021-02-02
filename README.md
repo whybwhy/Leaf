@@ -6,7 +6,7 @@
 - Spring Data JPA 2.3.4 (JPA)
 - Hibernate 5.4.21 (JPA)
 - Lombok (Support)
-- JUnit 4 (Test)
+- JUnit 5 (Test)
 - LogBack 1.2.3 (Log)
 - mysql 8.0
 
