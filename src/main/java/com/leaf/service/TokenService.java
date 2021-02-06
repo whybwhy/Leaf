@@ -70,7 +70,7 @@ public class TokenService {
 
         // 채팅방과 사용자의 정합성 검증
         chatRoomService.findByChatRoomIdAndUserId(roomId, userId)
-                .orElseThrow(GlobalExceptionMessage.INVALID_USER_ROOM::exception);
+                .orElseThrow(GlobalExceptionMessage.INVALID_USER_AND_ROOM::exception);
 
         // 토큰 발급/검증
         String tokenStream = tokenGenerator.generate(retry);
@@ -94,7 +94,7 @@ public class TokenService {
 
         // userId, roomId 정합성 체크
         chatRoomService.findByChatRoomIdAndUserId(chatRoomId, userId)
-                .orElseThrow(GlobalExceptionMessage.INVALID_USER_ROOM::exception);
+                .orElseThrow(GlobalExceptionMessage.INVALID_USER_AND_ROOM::exception);
 
         Token tokenInfo = tokenRepository.findById(token).orElseThrow(GlobalExceptionMessage.INVALID_TOKEN::exception);
 
@@ -104,7 +104,7 @@ public class TokenService {
 
         // 해당 채팅방에서 생성된 토큰 여부 유효성 체크
         if (!tokenInfo.getRoomId().equals(chatRoomId))
-            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_ROOM);
+            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_BY_ROOM);
 
         // 토큰 유효시간 체크
         if(tokenInfo.getExpiredDate().isBefore(LocalDateTime.now()))
@@ -112,7 +112,7 @@ public class TokenService {
 
         // 토큰 전체 소모 여부 체크
         if (tokenInfo.getTokenHistoryList().size() == tokenInfo.getCount())
-            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_ALREADY);
+            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_ALL_DONE);
 
         // 동일한 사용자가 중복 캐시 발급 불가
         Optional<TokenHistory> tokenHistoryOptional = tokenInfo.getTokenHistoryList().stream().filter(history -> history.getUserId().equals(userId)).findFirst();
@@ -141,11 +141,11 @@ public class TokenService {
 
         // 토큰 생성자 유효성 체크
         if(tokenInfo.getOwnerId().equals(userId))
-            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_OWNER2);
+            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_OWNER);
 
         // 토큰 조회 기한 유효성 체크
         if(tokenInfo.getCreatedDate().plus(token_read_time, ChronoUnit.DAYS).isBefore(LocalDateTime.now()))
-            throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_DATE);
+            throw new GlobalException(GlobalExceptionMessage.INVALID_EXPIRED_TOKE);
 
         return tokenInfo;
     }

@@ -34,7 +34,7 @@ LeafHttpClient.http
 #### 파라메터나 헤더 데이터에 한글 처리는 안되어 있습니다. 알파벳이나 숫자로 테스트가 가능합니다.
 
 ### 채팅방 + 신규 유저 생성
-GET http://localhost:8080/create/room/hihi
+GET http://localhost:8080/create/room/title
 X-USER-ID: test
 Connection: Close
 
