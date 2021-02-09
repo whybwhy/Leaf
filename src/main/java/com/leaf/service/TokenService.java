@@ -1,6 +1,7 @@
 package com.leaf.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leaf.LeafFilter;
 import com.leaf.domain.ChatUser;
 import com.leaf.domain.Token;
 import com.leaf.domain.TokenHistory;
@@ -33,7 +34,7 @@ public class TokenService {
     private final ChatRoomService chatRoomService;
     private final TokenGenerator tokenGenerator;
 
-    /**
+    /**s
      * 동일한 금액으로 분배
      * dividend/divisor 나머지가 발생할 경우 사용자 안내 메세지
      * @param count
@@ -139,15 +140,23 @@ public class TokenService {
         // 토큰 유효성 체크
         Token tokenInfo = tokenRepository.findById(token).orElseThrow(GlobalExceptionMessage.INVALID_TOKEN::exception);
 
+        /**
+         *  AS-IS
+         *
         // 토큰 생성자 유효성 체크
         if(tokenInfo.getOwnerId().equals(userId))
             throw new GlobalException(GlobalExceptionMessage.INVALID_TOKEN_OWNER);
 
         // 토큰 조회 기한 유효성 체크
         if(tokenInfo.getCreatedDate().plus(token_read_time, ChronoUnit.DAYS).isBefore(LocalDateTime.now()))
-            throw new GlobalException(GlobalExceptionMessage.INVALID_EXPIRED_TOKE);
+            throw new GlobalException(GlobalExceptionMessage.INVALID_EXPIRED_TOKE);*/
+
+        // TO-BE
+        LeafFilter.filter(
+                  () -> LeafFilter.test(GlobalExceptionMessage.INVALID_TOKEN_OWNER::exception, tokenInfo.getOwnerId().equals(userId))
+                , () -> LeafFilter.test(GlobalExceptionMessage.INVALID_EXPIRED_TOKE::exception, tokenInfo.getCreatedDate().plus(token_read_time, ChronoUnit.DAYS).isBefore(LocalDateTime.now()))
+        );
 
         return tokenInfo;
     }
-
 }
