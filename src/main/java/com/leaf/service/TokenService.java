@@ -1,8 +1,6 @@
 package com.leaf.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leaf.LeafFilter;
-import com.leaf.domain.ChatUser;
+import static com.leaf.LeafFilter.*;
 import com.leaf.domain.Token;
 import com.leaf.domain.TokenHistory;
 import com.leaf.entity.TokenHistoryRepository;
@@ -93,7 +91,33 @@ public class TokenService {
     @Transactional
     public TokenHistory consume(Long chatRoomId, String userId, String token) {
 
+        // TO-BE
+
         // userId, roomId 정합성 체크
+        filter(() -> test(GlobalExceptionMessage.INVALID_USER_AND_ROOM::exception, chatRoomService.findByChatRoomIdAndUserId(chatRoomId, userId).isPresent()));
+
+        Token tokenInfo = tokenRepository.findById(token).orElseThrow(GlobalExceptionMessage.INVALID_TOKEN::exception);
+
+        // 토큰 생성자 캐시 받기 불가
+        // 해당 채팅방에서 생성된 토큰 여부 유효성 체크
+        // 토큰 유효시간 체크
+        // 토큰 전체 소모 여부 체크
+        filter(() -> test(GlobalExceptionMessage.INVALID_TOKEN_OWNER::exception, !tokenInfo.getOwnerId().equals(userId))
+                , () -> test(GlobalExceptionMessage.INVALID_TOKEN_BY_ROOM::exception, tokenInfo.getRoomId().equals(chatRoomId))
+                , () -> test(GlobalExceptionMessage.INVALID_TOKEN::exception, tokenInfo.getExpiredDate().isAfter(LocalDateTime.now()))
+                , () -> test(GlobalExceptionMessage.INVALID_TOKEN_ALL_DONE::exception, tokenInfo.getTokenHistoryList().size() < tokenInfo.getCount())
+        );
+
+        Optional<TokenHistory> tokenHistoryOptional = tokenInfo.getTokenHistoryList().stream().filter(history -> history.getUserId().equals(userId)).findFirst();
+
+        // 동일한 사용자가 중복 캐시 발급 불가
+        filter(() -> test(GlobalExceptionMessage.INVALID_DUPLICATE_TOKEN::exception, !tokenHistoryOptional.isPresent()));
+
+
+        TokenHistory history = TokenHistory.builder().token(tokenInfo).amount(tokenInfo.getAmount()).userId(userId).build();
+        return tokenHistoryService.save(history);
+
+        /* AS-IS
         chatRoomService.findByChatRoomIdAndUserId(chatRoomId, userId)
                 .orElseThrow(GlobalExceptionMessage.INVALID_USER_AND_ROOM::exception);
 
@@ -122,7 +146,7 @@ public class TokenService {
 
         // 토큰 발급 성공 내역 업데이트
         TokenHistory history = TokenHistory.builder().token(tokenInfo).amount(tokenInfo.getAmount()).userId(userId).build();
-        return tokenHistoryService.save(history);
+        return tokenHistoryService.save(history);*/
     }
 
     /**
@@ -152,9 +176,9 @@ public class TokenService {
             throw new GlobalException(GlobalExceptionMessage.INVALID_EXPIRED_TOKE);*/
 
         // TO-BE
-        LeafFilter.filter(
-                  () -> LeafFilter.test(GlobalExceptionMessage.INVALID_TOKEN_OWNER::exception, tokenInfo.getOwnerId().equals(userId))
-                , () -> LeafFilter.test(GlobalExceptionMessage.INVALID_EXPIRED_TOKE::exception, tokenInfo.getCreatedDate().plus(token_read_time, ChronoUnit.DAYS).isBefore(LocalDateTime.now()))
+        filter(
+                  () -> test(GlobalExceptionMessage.INVALID_TOKEN_OWNER::exception, tokenInfo.getOwnerId().equals(userId))
+                , () -> test(GlobalExceptionMessage.INVALID_EXPIRED_TOKE::exception, tokenInfo.getCreatedDate().plus(token_read_time, ChronoUnit.DAYS).isBefore(LocalDateTime.now()))
         );
 
         return tokenInfo;
